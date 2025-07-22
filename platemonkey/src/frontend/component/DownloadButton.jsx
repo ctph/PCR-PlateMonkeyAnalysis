@@ -6,7 +6,7 @@ const DownloadButton = () => {
   return (
     <a href="/example.pdf" download>
       <Button type="primary" icon={<DownloadOutlined />}>
-        Download PDF
+        Download Template
       </Button>
     </a>
   );
