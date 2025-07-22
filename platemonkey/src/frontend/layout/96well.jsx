@@ -2,6 +2,7 @@ import React from "react";
 import Header from "../component/Header";
 import Banner from "../component/Banner";
 import DownloadButton from "../component/DownloadButton";
+import UploadButton from "../component/UploadButton";
 
 const Well96 = () => {
   return (
@@ -9,7 +10,10 @@ const Well96 = () => {
         <Header/>
         <Banner title='96 Well Plate' 
         subtitle='To use the feature, download existing template and fill in data for analysis'/>
-        <DownloadButton/>
+        <div style={{ display: "flex", gap: "20px", marginTop: 50, justifyContent: 'center' }}>
+            <DownloadButton/>
+            <UploadButton/>
+        </div>
     </div>
   );
 };
