@@ -11,7 +11,7 @@ const ChipCard = () => {
         <Banner title='SmartChip' 
         subtitle='To use the feature, download existing template and fill in data for analysis'/>
         <div style={{ display: "flex", gap: "20px", marginTop: 50, justifyContent: 'center' }}>
-            <DownloadButton/>
+            <DownloadButton filepath="/SmartChip_layout_template.xlsx"/>
             <UploadButton/>
         </div>
     </div>

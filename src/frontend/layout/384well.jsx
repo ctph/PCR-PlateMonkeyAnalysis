@@ -11,7 +11,7 @@ const Well384 = () => {
         <Banner title='384 Well Plate' 
         subtitle='To use the feature, download existing template and fill in data for analysis'/>
         <div style={{ display: "flex", gap: "20px", marginTop: 50, justifyContent: 'center' }}>
-            <DownloadButton/>
+            <DownloadButton filepath="/384-well_layout_template.xlsx"/>
             <UploadButton/>
         </div>
     </div>
