@@ -1,127 +1,111 @@
-import React, { useState } from 'react';
-import { SketchPicker } from 'react-color';
-import { Button, InputNumber, message, Switch } from 'antd';
-import { PlusOutlined, DeleteOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons';
+import React from "react";
+import { SketchPicker } from "react-color";
+import { Button, Card, InputNumber } from "antd";
+import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 
-const ColorHandling = ({ colorRanges, setColorRanges, dataMax = 40 }) => {
-  const [nextId, setNextId] = useState(0);
+const ColorHandling = ({ colorRanges, setColorRanges }) => {
+  // Change color for a specific range
+  const handleColorChange = (newColor, index) => {
+    const updated = [...colorRanges];
+    updated[index].color = newColor.hex;
+    setColorRanges(updated);
+  };
 
+  // Change min/max values
+  const handleRangeChange = (field, value, index) => {
+    const updated = [...colorRanges];
+    updated[index][field] = value || 0;
+    setColorRanges(updated);
+  };
+
+  // Add a new range
   const addColorRange = () => {
-    const newId = nextId;
-    setNextId(newId + 1);
-    
-    setColorRanges(prev => [
-      ...prev,
-      {
-        id: newId,
-        color: `#${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}`,
-        min: 0,
-        max: dataMax,
-        locked: true // New ranges start locked at full range
-      }
+    setColorRanges([
+      ...colorRanges,
+      { color: "#00ff00", min: 0, max: 10 },
     ]);
   };
 
-  const updateRange = (key, value, id) => {
-    setColorRanges(prev => 
-      prev.map(range => {
-        if (range.id !== id) return range;
-        
-        // Don't update if locked (except when unlocking)
-        if (range.locked && key !== 'locked') return range;
-        
-        const numValue = Number(value);
-        if (isNaN(numValue)) return range;
-        
-        const updated = { ...range };
-        
-        if (key === 'min') {
-          updated.min = Math.max(0, Math.min(range.max, numValue));
-        } 
-        else if (key === 'max') {
-          updated.max = Math.min(dataMax, Math.max(range.min, numValue));
-        }
-        else if (key === 'locked') {
-          updated.locked = value;
-        }
-        
-        return updated;
-      })
-    );
+  // Remove a range
+  const removeColorRange = (index) => {
+    if (colorRanges.length > 1) {
+      setColorRanges(colorRanges.filter((_, i) => i !== index));
+    } else {
+      alert("At least one color range is required.");
+    }
   };
 
   return (
     <div style={{ marginBottom: 20 }}>
-      <div style={{ display: "flex", justifyContent: "center", gap: "20px", flexWrap: "wrap" }}>
-        {colorRanges.map(range => (
-          <div key={range.id} style={{ textAlign: "center", border: "1px solid #ddd", padding: 10 }}>
-            <SketchPicker
-              color={range.color}
-              onChangeComplete={color => updateRange('color', color, range.id)}
-              width="200px"
-            />
-            
-            <div style={{ marginTop: 10 }}>
-              <Switch
-                checkedChildren={<UnlockOutlined />}
-                unCheckedChildren={<LockOutlined />}
-                checked={!range.locked}
-                onChange={checked => updateRange('locked', !checked, range.id)}
-                style={{ marginBottom: 8 }}
-              />
-              
-              <div>
-                <span>Min: </span>
-                <InputNumber
-                  value={range.min}
-                  onChange={val => updateRange('min', val, range.id)}
-                  disabled={range.locked}
-                  min={0}
-                  max={range.max}
-                  step={0.1}
-                  style={{ width: 80 }}
-                />
-              </div>
-              
-              <div style={{ marginTop: 5 }}>
-                <span>Max: </span>
-                <InputNumber
-                  value={range.max}
-                  onChange={val => updateRange('max', val, range.id)}
-                  disabled={range.locked}
-                  min={range.min}
-                  max={dataMax}
-                  step={0.1}
-                  style={{ width: 80 }}
-                />
-              </div>
-              
-              <Button
-                danger
-                icon={<DeleteOutlined />}
-                onClick={() => {
-                  if (colorRanges.length <= 1) {
-                    message.warning("At least one color range must remain");
-                    return;
-                  }
-                  setColorRanges(prev => prev.filter(r => r.id !== range.id));
-                }}
-                style={{ marginTop: 10 }}
+      {colorRanges.map((range, index) => (
+        <Card
+          key={index}
+          size="small"
+          style={{
+            display: "inline-block",
+            margin: 10,
+            padding: 10,
+            textAlign: "center",
+          }}
+        >
+          <SketchPicker
+            color={range.color}
+            onChangeComplete={(newColor) =>
+              handleColorChange(newColor, index)
+            }
+          />
+
+          <div style={{ marginTop: 10 }}>
+            <div style={{ marginBottom: 5 }}>
+              <span>Min:</span>
+              <InputNumber
+                min={0}
+                max={50}
+                step={0.001}
+                precision={3}
+                value={range.min}
+                onChange={(val) =>
+                  handleRangeChange("min", val, index)
+                }
+                style={{ marginTop: 5, width: "100%" }}
               />
             </div>
+
+            <div style={{ marginBottom: 5 }}>
+              <span>Max:</span>
+              <InputNumber
+                min={0}
+                max={50}
+                step={0.001}
+                precision={3}
+                value={range.max}
+                onChange={(val) =>
+                  handleRangeChange("max", val, index)
+                }
+                style={{ marginTop: 5, width: "100%" }}
+              />
+            </div>
+
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => removeColorRange(index)}
+              style={{ marginTop: 5 }}
+            >
+              Remove
+            </Button>
           </div>
-        ))}
-      </div>
-      
-      <div style={{ textAlign: "center", marginTop: 20 }}>
-        <Button 
-          type="dashed" 
-          icon={<PlusOutlined />} 
-          onClick={addColorRange}
-        >
-          Add Color Range (Locked at 0-{dataMax} by default)
-        </Button>
-      </div>
+        </Card>
+      ))}
+
+      <Button
+        type="dashed"
+        icon={<PlusOutlined />}
+        onClick={addColorRange}
+        style={{ marginTop: 10 }}
+      >
+        Add Color Range
+      </Button>
     </div>
   );
 };
