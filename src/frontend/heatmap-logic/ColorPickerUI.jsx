@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { SketchPicker } from "react-color";
-import { Button } from "antd";
+import { Button, Card } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 
 const ColorPickerUI = ({ onColorsChange }) => {
-  const [colors, setColors] = useState(["#0000ff", "#ff0000"]); // Default: Blue to Red
+  const [colors, setColors] = useState(["#0000ff", "#ff0000"]);
 
-  // Handle color change
   const handleColorChange = (color, index) => {
     const updatedColors = [...colors];
     updatedColors[index] = color.hex;
@@ -14,18 +13,17 @@ const ColorPickerUI = ({ onColorsChange }) => {
     onColorsChange(updatedColors);
   };
 
-  // Add new color
   const addColor = () => {
-    setColors([...colors, "#00ff00"]); // Add green by default
-    onColorsChange([...colors, "#00ff00"]);
+    const updated = [...colors, "#00ff00"];
+    setColors(updated);
+    onColorsChange(updated);
   };
 
-  // Remove color
   const removeColor = (index) => {
     if (colors.length > 2) {
-      const updatedColors = colors.filter((_, i) => i !== index);
-      setColors(updatedColors);
-      onColorsChange(updatedColors);
+      const updated = colors.filter((_, i) => i !== index);
+      setColors(updated);
+      onColorsChange(updated);
     } else {
       alert("At least 2 colors are required.");
     }
@@ -34,14 +32,27 @@ const ColorPickerUI = ({ onColorsChange }) => {
   return (
     <div style={{ padding: 20 }}>
       <h3>Customize Heatmap Colors</h3>
+
+      {/* Gradient Preview */}
+      <div
+        style={{
+          height: "20px",
+          width: "100%",
+          background: `linear-gradient(to right, ${colors.join(", ")})`,
+          marginBottom: "15px",
+          borderRadius: "5px",
+        }}
+      />
+
       {colors.map((color, index) => (
-        <div
+        <Card
           key={index}
+          size="small"
           style={{
             display: "flex",
             alignItems: "center",
             marginBottom: 10,
-            gap: "10px",
+            padding: "10px",
           }}
         >
           <SketchPicker
@@ -52,11 +63,13 @@ const ColorPickerUI = ({ onColorsChange }) => {
             danger
             icon={<DeleteOutlined />}
             onClick={() => removeColor(index)}
+            style={{ marginLeft: "10px" }}
           >
             Remove
           </Button>
-        </div>
+        </Card>
       ))}
+
       <Button type="dashed" icon={<PlusOutlined />} onClick={addColor}>
         Add Color
       </Button>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Plot from "react-plotly.js";
 import { SketchPicker } from "react-color";
-import { Slider, InputNumber } from "antd";
+import { InputNumber } from "antd";
 
 const HeatmapWithColorPicker = () => {
   // Dummy CT data
@@ -29,8 +29,9 @@ const HeatmapWithColorPicker = () => {
           min={0}
           max={50}
           step={0.001}
+          precision={3}  // Allows up to 3 decimal places
           value={minCT}
-          onChange={(value) => setMinCT(value)}
+          onChange={(value) => setMinCT(Number(value.toFixed(3)))}
           style={{ margin: "0 10px" }}
         />
         <span>CT Max:</span>
@@ -38,8 +39,9 @@ const HeatmapWithColorPicker = () => {
           min={0}
           max={50}
           step={0.001}
+          precision={3}  // Allows up to 3 decimal places
           value={maxCT}
-          onChange={(value) => setMaxCT(value)}
+          onChange={(value) => setMaxCT(Number(value.toFixed(3)))}
           style={{ margin: "0 10px" }}
         />
       </div>
