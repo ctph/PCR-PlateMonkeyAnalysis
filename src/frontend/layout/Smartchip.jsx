@@ -2,6 +2,7 @@ import React from "react";
 import Header from "../component/Header";
 import Banner from "../component/Banner";
 import DownloadButton from "../component/DownloadButton";
+import HeatmapPlotSmartchip from "../heatmap-logic/HeatmapSmartChip";
 
 const ChipCard = () => {
   return (
@@ -11,6 +12,9 @@ const ChipCard = () => {
         subtitle='To use the feature, download existing template and fill in data for analysis'/>
         <div style={{ display: "flex", gap: "20px", marginTop: 50, justifyContent: 'center' }}>
             <DownloadButton filepath="/SmartChip_layout_template.xlsx"/>
+        </div>
+        <div>
+          <HeatmapPlotSmartchip/>
         </div>
     </div>
   );
