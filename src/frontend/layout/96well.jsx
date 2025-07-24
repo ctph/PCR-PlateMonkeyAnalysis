@@ -3,14 +3,13 @@ import Header from "../component/Header";
 import Banner from "../component/Banner";
 import DownloadButton from "../component/DownloadButton";
 import UploadButton from "../component/UploadButton";
-import HeatmapPlot from "../heatmap-logic/HeatmapPlot";
+import HeatmapPlot from "../heatmap-logic/HeatmapPlot96";
 
 const Well96 = () => {
   const [uploadedData, setUploadedData] = useState(null);
 
   const handleFileUpload = (file) => {
     console.log("Uploaded 96-well CSV:", file);
-    // TODO: Parse CSV (e.g., with PapaParse) and store data in uploadedData
     setUploadedData(file);
   };
 

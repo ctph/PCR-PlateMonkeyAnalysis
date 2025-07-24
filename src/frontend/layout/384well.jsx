@@ -2,7 +2,7 @@ import React from "react";
 import Header from "../component/Header";
 import Banner from "../component/Banner";
 import DownloadButton from "../component/DownloadButton";
-import UploadButton from "../component/UploadButton";
+import HeatmapPlot384 from "../heatmap-logic/HeatmapPlot384";
 
 const Well384 = () => {
   return (
@@ -12,6 +12,10 @@ const Well384 = () => {
         subtitle='To use the feature, download existing template and fill in data for analysis'/>
         <div style={{ display: "flex", gap: "20px", marginTop: 50, justifyContent: 'center' }}>
             <DownloadButton filepath="/384-well_layout_template.xlsx"/>
+        </div>
+        {/* Heatmap & Color Picker */}
+        <div style={{ marginTop: 50 }}>
+          <HeatmapPlot384 />
         </div>
     </div>
   );

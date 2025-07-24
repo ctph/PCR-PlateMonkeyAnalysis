@@ -2,7 +2,6 @@ import React from "react";
 import Header from "../component/Header";
 import Banner from "../component/Banner";
 import DownloadButton from "../component/DownloadButton";
-import UploadButton from "../component/UploadButton";
 
 const ChipCard = () => {
   return (
