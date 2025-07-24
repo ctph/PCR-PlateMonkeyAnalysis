@@ -33,7 +33,7 @@ const Well96 = () => {
         }}
       >
         <DownloadButton filePath="/96-well_layout_template.xlsx" />
-        <UploadButton onFileSelect={handleFileUpload} />
+        {/* <UploadButton onFileSelect={handleFileUpload} /> */}
       </div>
 
       {/* Heatmap & Color Picker */}
