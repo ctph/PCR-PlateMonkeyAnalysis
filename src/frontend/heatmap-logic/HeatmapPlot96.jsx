@@ -5,6 +5,7 @@ import { Button } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import ColorHandling from "./ColorHandling";
 import { getNextUnusedWell } from "./DuplicateWellPosition";
+// import TargetFilter from "./TargetFilter";
 
 const HeatmapPlot = () => {
   const [zData, setZData] = useState(Array.from({ length: 72 }, () => Array(72).fill(null)));
@@ -13,6 +14,7 @@ const HeatmapPlot = () => {
     { color: "#ff0000", min: 10, max: 20 },
   ]);
   const [wellPositionMap, setWellPositionMap] = useState({});
+  const [selectedTarget, setSelectedTarget] = useState("ALL");
 
   // Load well position map from JSON once
   useEffect(() => {
@@ -66,6 +68,7 @@ const HeatmapPlot = () => {
       <h2>96 Well Plate Heatmap</h2>
 
       <div style={{ marginBottom: 20 }}>
+        {/* <TargetFilter selectedTarget={selectedTarget} setSelectedTarget={setSelectedTarget} /> */}
         <input
           type="file"
           accept=".csv"
