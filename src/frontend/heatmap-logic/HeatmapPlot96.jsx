@@ -16,7 +16,8 @@ const HeatmapPlot = () => {
   const [wellPositionMap, setWellPositionMap] = useState({});
   const [selectedTarget, setSelectedTarget] = useState("ALL");
   const [csvData, setCsvData] = useState([]);
-
+  const [textData, setTextData] = useState(Array.from({ length: 72 }, () => Array(72).fill("")));
+  
   useEffect(() => {
     fetch("/96position_map.json")
       .then((res) => res.json())
@@ -40,6 +41,8 @@ const HeatmapPlot = () => {
     if (!csvData.length || Object.keys(wellPositionMap).length === 0) return;
 
     const grid = Array.from({ length: 72 }, () => Array(72).fill(null));
+    const textGrid = Array.from({ length: 72 }, () => Array(72).fill(""));
+
 
     csvData.forEach((row) => {
       const well = row["Well no"];
@@ -55,10 +58,15 @@ const HeatmapPlot = () => {
       if (coords && !isNaN(value)) {
         const [r, c] = coords;
         grid[r][c] = value;
+          const sampleId = row["Sample iD"] || "N/A";
+          textGrid[r][c] = `Well: ${well}<br>Sample ID: ${sampleId}<br>Ct: ${value}`;
       }
     });
 
     setZData(grid);
+    setZData(grid);
+    setTextData(textGrid);
+
   }, [csvData, selectedTarget, wellPositionMap]);
 
   const createCustomColorscale = () => {
@@ -97,6 +105,9 @@ const HeatmapPlot = () => {
         data={[
           {
             z: zData,
+            text: textData,
+            hoverinfo: "text",
+            hovertemplate: "%{text}<extra></extra>",
             type: "heatmap",
             colorscale: createCustomColorscale(),
             showscale: true,
