@@ -5,7 +5,7 @@ import { Button } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import ColorHandling from "./ColorHandling";
 import TargetFilter from "./TargetFilter";
-import { getNextUnusedWell } from "./DuplicateWellPosition";
+import { createGetNextUnusedWell } from "./DuplicateWellPosition";
 
 const HeatmapPlot = () => {
   const [zData, setZData] = useState(Array.from({ length: 72 }, () => Array(72).fill(null)));
@@ -38,36 +38,37 @@ const HeatmapPlot = () => {
   };
 
   useEffect(() => {
-    if (!csvData.length || Object.keys(wellPositionMap).length === 0) return;
+  if (!csvData.length || Object.keys(wellPositionMap).length === 0) return;
 
-    const grid = Array.from({ length: 72 }, () => Array(72).fill(null));
-    const textGrid = Array.from({ length: 72 }, () => Array(72).fill(""));
+  const getNextUnusedWell = createGetNextUnusedWell();  // NEW local instance per filter change
+  const grid = Array.from({ length: 72 }, () => Array(72).fill(null));
+  const textGrid = Array.from({ length: 72 }, () => Array(72).fill(""));
 
+  csvData.forEach((row) => {
+    const well = row["Well no"];
+    const ctRaw = row["Ct value"];
+    const target = row["Target"]?.toString().trim().toUpperCase();
+    const sampleId = row["Sample iD"] || "N/A";
+    const rowNo = row["Row.No"] || "N/A";
+    const colNo = row["Column no"] || "N/A";
 
-    csvData.forEach((row) => {
-      const well = row["Well no"];
-      const ctRaw = row["Ct value"];
-      const target = row["Target"]?.toString().trim().toUpperCase();
+    if (!well || ctRaw === undefined) return;
+    if (selectedTarget !== "ALL" && target !== selectedTarget) return;
 
-      if (!well || ctRaw === undefined) return;
-      if (selectedTarget !== "ALL" && target !== selectedTarget) return;
+    const value = ctRaw.toString().trim().toUpperCase() === "UNDETERMINED" ? 0 : parseFloat(ctRaw);
+    const coords = getNextUnusedWell(well, wellPositionMap);
 
-      const value = ctRaw.toString().trim().toUpperCase() === "UNDETERMINED" ? 0 : parseFloat(ctRaw);
-      const coords = getNextUnusedWell(well, wellPositionMap);
+    if (coords && !isNaN(value)) {
+      const [r, c] = coords;
+      grid[r][c] = value;
+      textGrid[r][c] = `Well: ${well}<br>Sample ID: ${sampleId}<br>Ct: ${value}<br>Row.No: ${rowNo}<br>Column no: ${colNo}`;
+    }
+  });
 
-      if (coords && !isNaN(value)) {
-        const [r, c] = coords;
-        grid[r][c] = value;
-          const sampleId = row["Sample iD"] || "N/A";
-          textGrid[r][c] = `Well: ${well}<br>Sample ID: ${sampleId}<br>Ct: ${value}`;
-      }
-    });
+  setZData([...grid.map(row => [...row])]);
+  setTextData([...textGrid.map(row => [...row])]);
+}, [csvData, selectedTarget, wellPositionMap]);
 
-    setZData(grid);
-    setZData(grid);
-    setTextData(textGrid);
-
-  }, [csvData, selectedTarget, wellPositionMap]);
 
   const createCustomColorscale = () => {
     const zmin = Math.min(...colorRanges.map((r) => r.min));
@@ -102,6 +103,7 @@ const HeatmapPlot = () => {
       <ColorHandling colorRanges={colorRanges} setColorRanges={setColorRanges} />
 
       <Plot
+        key={selectedTarget}
         data={[
           {
             z: zData,
@@ -137,6 +139,7 @@ const HeatmapPlot = () => {
           margin: { t: 50, b: 50, l: 50, r: 50 },
         }}
       />
+
     </div>
   );
 };

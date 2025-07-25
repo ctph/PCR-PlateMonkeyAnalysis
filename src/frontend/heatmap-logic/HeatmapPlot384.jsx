@@ -5,7 +5,6 @@ import { Button } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import ColorHandling from "./ColorHandling";
 import TargetFilter384 from "./TargetFilter384";
-import { getNextUnusedWell } from "./DuplicateWellPosition";
 
 const HeatmapPlot = () => {
   const [zData, setZData] = useState(Array.from({ length: 72 }, () => Array(72).fill(null)));
@@ -38,7 +37,7 @@ const HeatmapPlot = () => {
   };
 
   useEffect(() => {
-    if (!csvData.length || Object.keys(wellPositionMap).length === 0) return;
+    if (!csvData.length) return;
 
     const grid = Array.from({ length: 72 }, () => Array(72).fill(null));
     const hoverGrid = Array.from({ length: 72 }, () => Array(72).fill(""));
@@ -47,24 +46,24 @@ const HeatmapPlot = () => {
       const well = row["Well no"];
       const ctRaw = row["Ct value"];
       const target = row["Target"]?.toString().trim().toUpperCase();
+      const row_id = parseInt(row["Row.No"]);
+      const col_id = parseInt(row["Column no"]);
+      const sampleId = row["Sample iD"];
 
-      if (!well || ctRaw === undefined) return;
+      if (!well || ctRaw === undefined || isNaN(row_id) || isNaN(col_id)) return;
       if (selectedTarget !== "ALL" && target !== selectedTarget) return;
 
       const value = ctRaw.toString().trim().toUpperCase() === "UNDETERMINED" ? 0 : parseFloat(ctRaw);
-      const coords = getNextUnusedWell(well, wellPositionMap);
-      const sampleId = row["Sample iD"];
 
-      if (coords && !isNaN(value)) {
-        const [r, c] = coords;
-        grid[r][c] = value;
-        hoverGrid[r][c] = `Well: ${well}<br>Sample ID: ${sampleId}<br>Ct: ${value}`;
+      if (!isNaN(value)) {
+        grid[row_id][col_id] = value;
+        hoverGrid[row_id][col_id] = `Well: ${well}<br>Sample ID: ${sampleId}<br>Ct: ${value}<br>Row: ${row_id}<br>Column: ${col_id}`;
       }
     });
 
     setZData(grid);
     setTextData(hoverGrid);
-  }, [csvData, selectedTarget, wellPositionMap]);
+  }, [csvData, selectedTarget]);
 
   const createCustomColorscale = () => {
     const zmin = Math.min(...colorRanges.map((r) => r.min));
