@@ -9,22 +9,21 @@ import { getNextUnusedWell } from "./DuplicateWellPosition";
 
 const HeatmapPlot = () => {
   const [zData, setZData] = useState(Array.from({ length: 72 }, () => Array(72).fill(null)));
+  const [textData, setTextData] = useState(Array.from({ length: 72 }, () => Array(72).fill("")));
   const [colorRanges, setColorRanges] = useState([
     { color: "#0000ff", min: 0, max: 10 },
-    { color: "#ff0000", min: 10, max: 20 },
+    { color: "#ff0000", min: 10, max: 40 },
   ]);
-  const [wellPositionMap, setWellPositionMap] = useState({});
   const [selectedTarget, setSelectedTarget] = useState("ALL");
-  const [csvData, setCsvData] = useState([]); 
+  const [csvData, setCsvData] = useState([]);
+  const [wellPositionMap, setWellPositionMap] = useState({});
 
-  // Load well position map once
   useEffect(() => {
     fetch("/384position_map.json")
       .then((res) => res.json())
       .then((data) => setWellPositionMap(data));
   }, []);
 
-  // Handle CSV upload → parse + store in state
   const handleCSVUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -33,16 +32,16 @@ const HeatmapPlot = () => {
       header: true,
       skipEmptyLines: true,
       complete: (results) => {
-        setCsvData(results.data); 
+        setCsvData(results.data);
       },
     });
   };
 
-  // Re-generate heatmap on filter change or new CSV
   useEffect(() => {
     if (!csvData.length || Object.keys(wellPositionMap).length === 0) return;
 
     const grid = Array.from({ length: 72 }, () => Array(72).fill(null));
+    const hoverGrid = Array.from({ length: 72 }, () => Array(72).fill(""));
 
     csvData.forEach((row) => {
       const well = row["Well no"];
@@ -54,14 +53,17 @@ const HeatmapPlot = () => {
 
       const value = ctRaw.toString().trim().toUpperCase() === "UNDETERMINED" ? 0 : parseFloat(ctRaw);
       const coords = getNextUnusedWell(well, wellPositionMap);
+      const sampleId = row["Sample iD"];
 
       if (coords && !isNaN(value)) {
         const [r, c] = coords;
         grid[r][c] = value;
+        hoverGrid[r][c] = `Well: ${well}<br>Sample ID: ${sampleId}<br>Ct: ${value}`;
       }
     });
 
     setZData(grid);
+    setTextData(hoverGrid);
   }, [csvData, selectedTarget, wellPositionMap]);
 
   const createCustomColorscale = () => {
@@ -72,6 +74,9 @@ const HeatmapPlot = () => {
       [(r.max - zmin) / (zmax - zmin), r.color],
     ]);
   };
+
+  const zmin = Math.min(...colorRanges.map((r) => r.min));
+  const zmax = Math.max(...colorRanges.map((r) => r.max));
 
   return (
     <div style={{ textAlign: "center", padding: 5 }}>
@@ -97,9 +102,14 @@ const HeatmapPlot = () => {
         data={[
           {
             z: zData,
+            text: textData,
+            hoverinfo: "text",
+            hovertemplate: "%{text}<extra></extra>",
             type: "heatmap",
             colorscale: createCustomColorscale(),
             showscale: true,
+            zmin: zmin,
+            zmax: zmax,
             xgap: 1,
             ygap: 1,
           },

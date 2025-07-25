@@ -4,7 +4,7 @@ import { Select } from "antd";
 const { Option } = Select;
 
 const TargetFilter384 = ({ selectedTarget, setSelectedTarget }) => {
-  const fixedTargets = ["ALL", "NA", "EU", "XENO", "IAV", "Mgene", "XIPC"];
+    const fixedTargets = ["ALL", "NA", "EU", "XENO", "IAV", "MGENE", "XIPC"];
 
   return (
     <div style={{ marginBottom: 20 }}>
