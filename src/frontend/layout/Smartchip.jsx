@@ -9,7 +9,7 @@ const ChipCard = () => {
     <div style={{ padding: 20 }}>
     <Header/>
         <Banner title='SmartChip' 
-        subtitle='To use the feature, download existing template and fill in data for analysis'/>
+        subtitle='To use the feature, download existing template and fill in data for analysis. Please set your ranges and target first and finally upload your csv file'/>
         <div style={{ display: "flex", gap: "20px", marginTop: 50, justifyContent: 'center' }}>
             <DownloadButton filepath="/SmartChip_layout_template.xlsx"/>
         </div>

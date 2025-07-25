@@ -16,7 +16,7 @@ const Well96 = () => {
     <div style={{ padding: 20 }}>
     <Header/>
         <Banner title='96 Well Plate' 
-        subtitle='To use the feature, download existing template and fill in data for analysis. Refresh page after changing Target for better accuracy'/>
+        subtitle='To use the feature, download existing template and fill in data for analysis. Please set your ranges and target first and finally upload your csv file'/>
         <div style={{ display: "flex", gap: "20px", marginTop: 50, justifyContent: 'center' }}>
             <DownloadButton filepath="/96-well_layout_template.xlsx"/>
         </div>
