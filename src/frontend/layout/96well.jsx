@@ -14,30 +14,16 @@ const Well96 = () => {
 
   return (
     <div style={{ padding: 20 }}>
-      <Header />
-
-      <Banner
-        title="96 Well Plate"
-        subtitle="Download the template, fill in the CT values, and upload it for analysis"
-      />
-
-      {/* Download & Upload Buttons */}
-      <div
-        style={{
-          display: "flex",
-          gap: "20px",
-          marginTop: 30,
-          justifyContent: "center",
-        }}
-      >
-        <DownloadButton filePath="/96-well_layout_template.xlsx" />
-        {/* <UploadButton onFileSelect={handleFileUpload} /> */}
-      </div>
-
-      {/* Heatmap & Color Picker */}
-      <div style={{ marginTop: 50 }}>
-        <HeatmapPlot />
-      </div>
+    <Header/>
+        <Banner title='96 Well Plate' 
+        subtitle='To use the feature, download existing template and fill in data for analysis. Refresh page after changing Target for better accuracy'/>
+        <div style={{ display: "flex", gap: "20px", marginTop: 50, justifyContent: 'center' }}>
+            <DownloadButton filepath="/96-well_layout_template.xlsx"/>
+        </div>
+        {/* Heatmap & Color Picker */}
+        <div style={{ marginTop: 50 }}>
+          <HeatmapPlot/>
+        </div>
     </div>
   );
 };
