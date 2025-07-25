@@ -75,7 +75,7 @@ const HeatmapPlot = () => {
 
   return (
     <div style={{ textAlign: "center", padding: 5 }}>
-      <h2>96 Well Plate Heatmap</h2>
+      <h2>384 Well Plate Heatmap</h2>
 
       <div style={{ marginBottom: 20 }}>
         <TargetFilter384 selectedTarget={selectedTarget} setSelectedTarget={setSelectedTarget} />
@@ -107,7 +107,7 @@ const HeatmapPlot = () => {
         layout={{
           width: 800,
           height: 800,
-          title: `96-Well Plate Heatmap - ${selectedTarget}`,
+          title: `384-Well Plate Heatmap - ${selectedTarget}`,
           xaxis: {
             title: "Column",
             showgrid: true,
