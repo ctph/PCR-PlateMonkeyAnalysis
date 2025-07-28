@@ -4,6 +4,7 @@ import Banner from "../component/Banner";
 import DownloadButton from "../component/DownloadButton";
 import HeatmapPlot from "../heatmap-logic/HeatmapPlot96";
 import ViolinPlot from '../heatmap-logic/ViolinPlot';
+import PiChart from '../heatmap-logic/PiChart'
 
 const Well96 = () => {
   const [uploadedData, setUploadedData] = useState(null);

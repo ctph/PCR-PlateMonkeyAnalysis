@@ -6,6 +6,7 @@ import { UploadOutlined } from "@ant-design/icons";
 import ColorHandling from "./ColorHandling";
 import TargetFilter from "./TargetFilter";
 import { createGetNextUnusedWell } from "./DuplicateWellPosition";
+import SampleTypePieChart from "./PiChart";
 
 const HeatmapPlot = () => {
   const emptyGrid = Array.from({ length: 72 }, () => Array(72).fill(-1));
@@ -165,6 +166,7 @@ const HeatmapPlot = () => {
           shapes: borders
         }}
       />
+    <SampleTypePieChart csvData={csvData} />
     </div>
   );
 };

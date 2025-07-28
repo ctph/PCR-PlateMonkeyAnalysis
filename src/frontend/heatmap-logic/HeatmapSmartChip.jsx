@@ -5,6 +5,7 @@ import { Button } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import ColorHandling from "./ColorHandling";
 import TargetFilter from "./TargetFilter";
+import SampleTypePieChart from "./PiChart";
 
 const HeatmapPlotSmartchip = () => {
   const [zData, setZData] = useState(Array.from({ length: 72 }, () => Array(72).fill(0)));
@@ -157,6 +158,7 @@ const blockHeight = 8;
           shapes: borders
         }}
       />
+      <SampleTypePieChart/>
     </div>
   );
 };

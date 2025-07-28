@@ -5,11 +5,13 @@ import { Button } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import ColorHandling from "./ColorHandling";
 import TargetFilter384 from "./TargetFilter384";
+import SampleTypePieChart from "./PiChart";
 
 const HeatmapPlot = () => {
   const [zData, setZData] = useState(Array.from({ length: 72 }, () => Array(72).fill(-1)));
   const [textData, setTextData] = useState(Array.from({ length: 72 }, () => Array(72).fill("")));
   const [colorRanges, setColorRanges] = useState([
+    // { color: "#ffffff", min: -1, max: -1 },
     { color: "#ffffff", min: 0, max: 10 },
   ]);
   const [selectedTarget, setSelectedTarget] = useState("ALL");
@@ -38,7 +40,10 @@ const HeatmapPlot = () => {
   useEffect(() => {
     if (!csvData.length) return;
 
-    const grid = Array.from({ length: 72 }, () => Array(72).fill(null));
+    const EMPTY_VAL = -1;
+    const grid = Array.from({ length: 72 }, () => Array(72).fill(EMPTY_VAL));
+
+    // const grid = Array.from({ length: 72 }, () => Array(72).fill(null));
     const hoverGrid = Array.from({ length: 72 }, () => Array(72).fill(""));
 
     csvData.forEach((row) => {
@@ -57,7 +62,11 @@ const HeatmapPlot = () => {
       if (!isNaN(value)) {
         grid[row_id][col_id] = value;
         hoverGrid[row_id][col_id] = `Well: ${well}<br>Sample ID: ${sampleId}<br>Ct: ${value}<br>Row: ${row_id}<br>Column: ${col_id}`;
+      } else {
+        grid[row_id][col_id] = EMPTY_VAL;
+        hoverGrid[row_id][col_id] = `Well: ${well}<br>Sample ID: ${sampleId}<br>No Ct Value`;
       }
+
     });
 
     setZData(grid);
@@ -158,6 +167,7 @@ const HeatmapPlot = () => {
           shapes: borders
         }}
       />
+      <SampleTypePieChart csvData={csvData} />
     </div>
   );
 };
