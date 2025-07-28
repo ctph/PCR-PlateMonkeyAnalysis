@@ -4,29 +4,30 @@ import { Button, Card, InputNumber } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 
 const ColorHandling = ({ colorRanges, setColorRanges }) => {
-  // Change color for a specific range
+  // Ensure hex is stored, ignoring alpha
   const handleColorChange = (newColor, index) => {
     const updated = [...colorRanges];
-    updated[index].color = newColor.hex;
+    // Use .hex for clean hex value, ignoring alpha
+    updated[index].color = newColor.hex.toUpperCase(); 
     setColorRanges(updated);
   };
 
-  // Change min/max values
+  // Min/max handlers
   const handleRangeChange = (field, value, index) => {
     const updated = [...colorRanges];
-    updated[index][field] = value || 0;
+    updated[index][field] = typeof value === "number" ? value : 0;
     setColorRanges(updated);
   };
 
-  // Add a new range
+  // Add a default color range
   const addColorRange = () => {
     setColorRanges([
       ...colorRanges,
-      { color: "#00ff00", min: 0, max: 10 },
+      { color: "#00FF00", min: 0, max: 10 },
     ]);
   };
 
-  // Remove a range
+  // Remove a range if more than one
   const removeColorRange = (index) => {
     if (colorRanges.length > 1) {
       setColorRanges(colorRanges.filter((_, i) => i !== index));
@@ -49,10 +50,8 @@ const ColorHandling = ({ colorRanges, setColorRanges }) => {
           }}
         >
           <SketchPicker
-            color={range.color}
-            onChangeComplete={(newColor) =>
-              handleColorChange(newColor, index)
-            }
+            color={{ hex: range.color }}
+            onChangeComplete={(newColor) => handleColorChange(newColor, index)}
           />
 
           <div style={{ marginTop: 10 }}>
@@ -64,9 +63,7 @@ const ColorHandling = ({ colorRanges, setColorRanges }) => {
                 step={0.001}
                 precision={3}
                 value={range.min}
-                onChange={(val) =>
-                  handleRangeChange("min", val, index)
-                }
+                onChange={(val) => handleRangeChange("min", val, index)}
                 style={{ marginTop: 5, width: "100%" }}
               />
             </div>
@@ -79,9 +76,7 @@ const ColorHandling = ({ colorRanges, setColorRanges }) => {
                 step={0.001}
                 precision={3}
                 value={range.max}
-                onChange={(val) =>
-                  handleRangeChange("max", val, index)
-                }
+                onChange={(val) => handleRangeChange("max", val, index)}
                 style={{ marginTop: 5, width: "100%" }}
               />
             </div>
