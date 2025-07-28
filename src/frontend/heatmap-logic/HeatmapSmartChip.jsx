@@ -158,7 +158,7 @@ const blockHeight = 8;
           shapes: borders
         }}
       />
-      <SampleTypePieChart/>
+      <SampleTypePieChart csvData={csvData} />
     </div>
   );
 };
