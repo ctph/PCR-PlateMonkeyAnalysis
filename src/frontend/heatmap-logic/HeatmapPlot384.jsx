@@ -7,11 +7,10 @@ import ColorHandling from "./ColorHandling";
 import TargetFilter384 from "./TargetFilter384";
 
 const HeatmapPlot = () => {
-  const [zData, setZData] = useState(Array.from({ length: 72 }, () => Array(72).fill(null)));
+  const [zData, setZData] = useState(Array.from({ length: 72 }, () => Array(72).fill(-1)));
   const [textData, setTextData] = useState(Array.from({ length: 72 }, () => Array(72).fill("")));
   const [colorRanges, setColorRanges] = useState([
-    { color: "#0000ff", min: 0, max: 10 },
-    { color: "#ff0000", min: 10, max: 40 },
+    { color: "#ffffff", min: 0, max: 10 },
   ]);
   const [selectedTarget, setSelectedTarget] = useState("ALL");
   const [csvData, setCsvData] = useState([]);
@@ -77,6 +76,30 @@ const HeatmapPlot = () => {
   const zmin = Math.min(...colorRanges.map((r) => r.min));
   const zmax = Math.max(...colorRanges.map((r) => r.max));
 
+  const blockHeight = 8;
+  const blockWidth = 12;
+  const gridSize = 72;
+
+  const borders = [];
+  for (let row = 0; row < gridSize; row += blockHeight) {
+    for (let col = 0; col < gridSize; col += blockWidth) {
+      borders.push({
+        type: 'rect',
+        xref: 'x',
+        yref: 'y',
+        x0: col - 0.5,
+        y0: row - 0.5,
+        x1: col + blockWidth - 0.5,
+        y1: row + blockHeight - 0.5,
+        line: {
+          color: 'black',
+          width: 3
+        },
+        fillcolor: 'rgba(0,0,0,0)' // transparent
+      });
+    }
+  }
+
   return (
     <div style={{ textAlign: "center", padding: 5 }}>
       <h2>384 Well Plate Heatmap</h2>
@@ -109,14 +132,15 @@ const HeatmapPlot = () => {
             showscale: true,
             zmin: zmin,
             zmax: zmax,
-            xgap: 1,
-            ygap: 1,
+            xgap: 2,
+            ygap: 2,
           },
         ]}
         layout={{
           width: 800,
           height: 800,
           title: `384-Well Plate Heatmap - ${selectedTarget}`,
+          plot_bgcolor: "#000000",
           xaxis: {
             title: "Column",
             showgrid: true,
@@ -131,6 +155,7 @@ const HeatmapPlot = () => {
             zeroline: false,
           },
           margin: { t: 50, b: 50, l: 50, r: 50 },
+          shapes: borders
         }}
       />
     </div>
