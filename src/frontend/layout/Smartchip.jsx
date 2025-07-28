@@ -3,6 +3,7 @@ import Header from "../component/Header";
 import Banner from "../component/Banner";
 import DownloadButton from "../component/DownloadButton";
 import HeatmapPlotSmartchip from "../heatmap-logic/HeatmapSmartChip";
+import ViolinPlot from "../heatmap-logic/ViolinPlot";
 
 const ChipCard = () => {
   return (
@@ -15,6 +16,9 @@ const ChipCard = () => {
         </div>
         <div>
           <HeatmapPlotSmartchip/>
+        </div>
+        <div>
+          <ViolinPlot/>
         </div>
     </div>
   );

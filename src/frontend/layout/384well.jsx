@@ -3,6 +3,7 @@ import Header from "../component/Header";
 import Banner from "../component/Banner";
 import DownloadButton from "../component/DownloadButton";
 import HeatmapPlot384 from "../heatmap-logic/HeatmapPlot384";
+import ViolinPlot384 from "../heatmap-logic/ViolinPlot384";
 
 const Well384 = () => {
   return (
@@ -16,6 +17,10 @@ const Well384 = () => {
         {/* Heatmap & Color Picker */}
         <div style={{ marginTop: 50 }}>
           <HeatmapPlot384 />
+        </div>
+        {/*Violin Plot*/}
+        <div style={{ marginTop: 50 }}>
+          <ViolinPlot384 />
         </div>
     </div>
   );

@@ -3,6 +3,7 @@ import Header from "../component/Header";
 import Banner from "../component/Banner";
 import DownloadButton from "../component/DownloadButton";
 import HeatmapPlot from "../heatmap-logic/HeatmapPlot96";
+import ViolinPlot from '../heatmap-logic/ViolinPlot';
 
 const Well96 = () => {
   const [uploadedData, setUploadedData] = useState(null);
@@ -23,6 +24,9 @@ const Well96 = () => {
         {/* Heatmap & Color Picker */}
         <div style={{ marginTop: 50 }}>
           <HeatmapPlot/>
+        </div>
+        <div style={{ marginTop: 50 }}>
+          <ViolinPlot/>
         </div>
     </div>
   );
