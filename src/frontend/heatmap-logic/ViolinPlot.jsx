@@ -21,25 +21,29 @@ const ViolinPlot = () => {
       },
     });
   };
-  
+
   useEffect(() => {
     if (!csvData || !Array.isArray(csvData)) return;
 
     const groups = { NA: [], EU: [], XENO: [] };
 
     csvData.forEach((row) => {
-        const well = row["Well no"] || "N/A";
-        const ctRaw = row["Ct value"];
-        const target = row["Target"]?.toString().trim().toUpperCase();
-        const sampleId = row["Sample iD"] || "N/A";
-        const rowNo = row["Row.No"] || "N/A";
-        const colNo = row["Column no"] || "N/A";
+      const well = row["Well no"] || "N/A";
+      const ctRaw = row["Ct value"];
+      const target = row["Target"]?.toString().trim().toUpperCase();
+      const sampleId = row["Sample iD"] || "N/A";
+      const rowNo = row["Row.No"] || "N/A";
+      const colNo = row["Column no"] || "N/A";
 
-        if (!["NA", "EU", "XENO"].includes(target)) return;
+      if (!["NA", "EU", "XENO"].includes(target)) return;
 
-        const ct = ctRaw?.toString().trim().toUpperCase() === "UNDETERMINED" ? 0 : parseFloat(ctRaw);
+      const ct =
+        ctRaw?.toString().trim().toUpperCase() === "UNDETERMINED"
+          ? 0
+          : parseFloat(ctRaw);
 
-        if (!isNaN(ct) && ct > 0) {
+      // Only include values > 0 and <= cutoff
+      if (!isNaN(ct) && ct > 0 && ct <= cutoff) {
         const hoverText = `
             Well: ${well}<br>
             Sample ID: ${sampleId}<br>
@@ -49,16 +53,16 @@ const ViolinPlot = () => {
         `;
 
         groups[target].push({ y: ct, text: hoverText });
-        }
+      }
     });
 
     setGroupedData(groups);
-    }, [csvData]);
+  }, [csvData, cutoff]); // recompute when cutoff changes
 
   const plotData = Object.entries(groupedData).map(([target, values]) => ({
     type: "violin",
-    y: values.map(v => v.y),
-    text: values.map(v => v.text),
+    y: values.map((v) => v.y),
+    text: values.map((v) => v.text),
     hoverinfo: "text",
     name: target,
     box: { visible: true },
@@ -66,10 +70,10 @@ const ViolinPlot = () => {
     points: "all",
     jitter: 0.3,
     marker: { size: 4 },
-    }));
+  }));
 
   const layout = {
-    title: "Ct Value Distribution by Target",
+    title: "Ct Value Distribution by Target (Filtered by Cutoff)",
     yaxis: { title: "Ct Value" },
     xaxis: { title: "Target Group" },
     width: 800,
@@ -98,10 +102,7 @@ const ViolinPlot = () => {
         y: cutoff,
         text: `Ct Cutoff = ${cutoff}`,
         showarrow: false,
-        font: {
-          color: "red",
-          size: 12,
-        },
+        font: { color: "red", size: 12 },
         align: "right",
       },
     ],
@@ -121,9 +122,7 @@ const ViolinPlot = () => {
         />
         <Button
           icon={<UploadOutlined />}
-          onClick={() =>
-            document.getElementById("violin-upload").click()
-          }
+          onClick={() => document.getElementById("violin-upload").click()}
         >
           Upload CSV
         </Button>
