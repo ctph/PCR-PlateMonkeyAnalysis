@@ -4,6 +4,7 @@ import PlateCard384 from "../component/384Card";
 import ChipCard from "../component/SmartchipCard";
 import Banner from "../component/Banner";
 import Header from "../component/Header";
+import Footer from "../component/Footer";
 
 const HomePage = () => {
   return (
@@ -18,6 +19,7 @@ const HomePage = () => {
         <PlateCard384 />
         <ChipCard/>
       </div>
+      <Footer/>
     </div>
   );
 };

@@ -4,6 +4,7 @@ import Banner from "../component/Banner";
 import DownloadButton from "../component/DownloadButton";
 import HeatmapPlotSmartchip from "../heatmap-logic/HeatmapSmartChip";
 import ViolinPlot from "../heatmap-logic/ViolinPlot";
+import Footer from "../component/FooterFeaturePage";
 
 const ChipCard = () => {
   return (
@@ -20,7 +21,8 @@ const ChipCard = () => {
         <div>
           <ViolinPlot/>
         </div>
-    </div>
+        <Footer/>
+    </div>  
   );
 };
 

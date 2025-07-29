@@ -4,6 +4,7 @@ import Banner from "../component/Banner";
 import DownloadButton from "../component/DownloadButton";
 import HeatmapPlot384 from "../heatmap-logic/HeatmapPlot384";
 import ViolinPlot384 from "../heatmap-logic/ViolinPlot384";
+import Footer from "../component/FooterFeaturePage";
 
 const Well384 = () => {
   return (
@@ -22,6 +23,7 @@ const Well384 = () => {
         <div style={{ marginTop: 50 }}>
           <ViolinPlot384 />
         </div>
+        <Footer/>
     </div>
   );
 };

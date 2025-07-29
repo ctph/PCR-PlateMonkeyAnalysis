@@ -5,6 +5,7 @@ import DownloadButton from "../component/DownloadButton";
 import HeatmapPlot from "../heatmap-logic/HeatmapPlot96";
 import ViolinPlot from '../heatmap-logic/ViolinPlot';
 import PiChart from '../heatmap-logic/PiChart'
+import Footer from "../component/FooterFeaturePage";
 
 const Well96 = () => {
   const [uploadedData, setUploadedData] = useState(null);
@@ -29,6 +30,7 @@ const Well96 = () => {
         <div style={{ marginTop: 50 }}>
           <ViolinPlot/>
         </div>
+        <Footer/>
     </div>
   );
 };
