@@ -92,7 +92,7 @@ const blockHeight = 8;
         y1: row + blockHeight - 0.5,
         line: {
           color: 'black',
-          width: 3
+          width: 1.5
         },
         fillcolor: 'rgba(0,0,0,0)' // transparent
       });
@@ -132,8 +132,8 @@ const blockHeight = 8;
             showscale: true,
             zmin: zmin,
             zmax: zmax,
-            xgap: 1,
-            ygap: 1,
+            xgap: 0.3,
+            ygap: 0.3,
           },
         ]}
         layout={{

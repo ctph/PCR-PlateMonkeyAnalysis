@@ -301,8 +301,7 @@ const ViolinPlot384 = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  };
-
+  }
   return (
     <div style={{ padding: 20, textAlign: "center" }}>
       <h2>384-Well CT Violin Plot</h2>

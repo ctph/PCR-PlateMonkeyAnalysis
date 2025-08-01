@@ -100,7 +100,7 @@ const HeatmapPlot = () => {
         y1: row + blockHeight - 0.5,
         line: {
           color: 'black',
-          width: 3
+          width: 1.5
         },
         fillcolor: 'rgba(0,0,0,0)' // transparent
       });
@@ -140,8 +140,8 @@ const HeatmapPlot = () => {
             showscale: true,
             zmin,
             zmax,
-            xgap: 2,
-            ygap: 2,
+            xgap: 0.3,
+            ygap: 0.3,
           },
         ]}
         layout={{
