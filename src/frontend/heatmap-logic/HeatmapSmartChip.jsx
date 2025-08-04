@@ -75,29 +75,29 @@ const HeatmapPlotSmartchip = () => {
   const zmin = Math.min(...colorRanges.map((r) => r.min));
   const zmax = Math.max(...colorRanges.map((r) => r.max));
 
-const blockHeight = 8;
-  const blockWidth = 12;
-  const gridSize = 72;
+// const blockHeight = 8;
+//   const blockWidth = 12;
+//   const gridSize = 72;
 
-  const borders = [];
-  for (let row = 0; row < gridSize; row += blockHeight) {
-    for (let col = 0; col < gridSize; col += blockWidth) {
-      borders.push({
-        type: 'rect',
-        xref: 'x',
-        yref: 'y',
-        x0: col - 0.5,
-        y0: row - 0.5,
-        x1: col + blockWidth - 0.5,
-        y1: row + blockHeight - 0.5,
-        line: {
-          color: 'black',
-          width: 1.5
-        },
-        fillcolor: 'rgba(0,0,0,0)' // transparent
-      });
-    }
-  }
+//   const borders = [];
+//   for (let row = 0; row < gridSize; row += blockHeight) {
+//     for (let col = 0; col < gridSize; col += blockWidth) {
+//       borders.push({
+//         type: 'rect',
+//         xref: 'x',
+//         yref: 'y',
+//         x0: col - 0.5,
+//         y0: row - 0.5,
+//         x1: col + blockWidth - 0.5,
+//         y1: row + blockHeight - 0.5,
+//         line: {
+//           color: 'black',
+//           width: 1.5
+//         },
+//         fillcolor: 'rgba(0,0,0,0)' // transparent
+//       });
+//     }
+//   }
 
 
   return (
@@ -154,8 +154,8 @@ const blockHeight = 8;
             gridcolor: "#ccc",
             zeroline: false,
           },
-          margin: { t: 50, b: 50, l: 50, r: 50 },
-          shapes: borders
+          // margin: { t: 50, b: 50, l: 50, r: 50 },
+          // shapes: borders
         }}
       />
       <SampleTypePieChart csvData={csvData} />
