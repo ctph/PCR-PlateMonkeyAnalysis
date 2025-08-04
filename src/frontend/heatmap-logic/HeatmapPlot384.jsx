@@ -254,34 +254,11 @@ const HeatmapPlot = () => {
     setTextData(hoverGrid);
   }, [csvData, selectedTarget]);
 
-  // Function to insert NaN gaps for spacing every 16 rows and 24 columns
-  const insertGapsIntoGrid = (originalGrid, gapRowEvery = 16, gapColEvery = 24, fillValue = NaN) => {
-    const rows = originalGrid.length;
-    const cols = originalGrid[0].length;
-    const newGrid = [];
+  // 🔹 No more NaN gaps; use original grid directly
+  const processedZ = zData;
+  const processedText = textData;
 
-    for (let r = 0; r < rows; r++) {
-      const newRow = [];
-      for (let c = 0; c < cols; c++) {
-        newRow.push(originalGrid[r][c]);
-
-        // Insert gap column after every 24th col, except last
-        if ((c + 1) % gapColEvery === 0 && c !== cols - 1) {
-          newRow.push(fillValue);
-        }
-      }
-
-      newGrid.push(newRow);
-
-      // Insert gap row after every 16th row, except last
-      if ((r + 1) % gapRowEvery === 0 && r !== rows - 1) {
-        newGrid.push(Array(newRow.length).fill(fillValue));
-      }
-    }
-
-    return newGrid;
-  };
-
+  // 🔹 Custom colorscale based on user-defined ranges
   const createCustomColorscale = () => {
     const zmin = Math.min(...colorRanges.map((r) => r.min));
     const zmax = Math.max(...colorRanges.map((r) => r.max));
@@ -294,42 +271,33 @@ const HeatmapPlot = () => {
   const zmin = Math.min(...colorRanges.map((r) => r.min));
   const zmax = Math.max(...colorRanges.map((r) => r.max));
 
-  // Create processed data with gaps
-  const processedZ = insertGapsIntoGrid(zData, 16, 24, NaN);
-  const processedText = insertGapsIntoGrid(textData, 16, 24, "");
-
-  // Borders: match new grid with gaps
+  // 🔹 Create clean divider lines every 16 rows and 24 columns
   const borders = [];
-  const blockHeight = 16;
-  const blockWidth = 24;
-  let adjustedRows = processedZ.length;
-  let adjustedCols = processedZ[0].length;
+  const rowStep = 16;
+  const colStep = 24;
 
-  for (let row = 0; row < adjustedRows; row++) {
-    for (let col = 0; col < adjustedCols; col++) {
-      // Draw rectangle borders around actual 16×24 blocks
-      if (
-        row % (blockHeight + 1) === 0 &&
-        col % (blockWidth + 1) === 0 &&
-        row + blockHeight <= adjustedRows &&
-        col + blockWidth <= adjustedCols
-      ) {
-        borders.push({
-          type: "rect",
-          xref: "x",
-          yref: "y",
-          x0: col - 0.5,
-          y0: row - 0.5,
-          x1: col + blockWidth - 0.5,
-          y1: row + blockHeight - 0.5,
-          line: {
-            color: "black",
-            width: 1.5,
-          },
-          fillcolor: "rgba(0,0,0,0)", // transparent
-        });
-      }
-    }
+  // Horizontal lines
+  for (let r = rowStep; r < gridRows; r += rowStep) {
+    borders.push({
+      type: "line",
+      x0: -0.5,
+      y0: r - 0.5,
+      x1: gridCols - 0.5,
+      y1: r - 0.5,
+      line: { color: "black", width: 2 },
+    });
+  }
+
+  // Vertical lines
+  for (let c = colStep; c < gridCols; c += colStep) {
+    borders.push({
+      type: "line",
+      x0: c - 0.5,
+      y0: -0.5,
+      x1: c - 0.5,
+      y1: gridRows - 0.5,
+      line: { color: "black", width: 2 },
+    });
   }
 
   return (
@@ -364,8 +332,8 @@ const HeatmapPlot = () => {
             showscale: true,
             zmin: zmin,
             zmax: zmax,
-            xgap: 0.3,
-            ygap: 0.3,
+            xgap: 0.1, // Small gaps to show borders
+            ygap: 0.1,
           },
         ]}
         layout={{
@@ -373,21 +341,58 @@ const HeatmapPlot = () => {
           height: 800,
           title: `384-Well Plate Heatmap - ${selectedTarget}`,
           plot_bgcolor: "#000000",
+          paper_bgcolor: "#ffffff",
           xaxis: {
             title: "Column",
-            showgrid: true,
-            gridcolor: "#ccc",
+            showgrid: false,
             zeroline: false,
           },
           yaxis: {
             title: "Row",
             autorange: "reversed",
-            showgrid: true,
-            gridcolor: "#ccc",
+            showgrid: false,
             zeroline: false,
           },
           margin: { t: 50, b: 50, l: 50, r: 50 },
-          shapes: borders,
+          shapes: [
+            // Thin black grid lines for all cells
+            ...Array.from({ length: gridRows + 1 }).map((_, r) => ({
+              type: "line",
+              x0: -0.5,
+              y0: r - 0.5,
+              x1: gridCols - 0.5,
+              y1: r - 0.5,
+              line: { color: "black", width: 0.3 },
+            })),
+            ...Array.from({ length: gridCols + 1 }).map((_, c) => ({
+              type: "line",
+              x0: c - 0.5,
+              y0: -0.5,
+              x1: c - 0.5,
+              y1: gridRows - 0.5,
+              line: { color: "black", width: 0.3 },
+            })),
+
+            // 🔹 Thicker divider lines every 16 rows
+            ...Array.from({ length: Math.floor(gridRows / 16) }).map((_, i) => ({
+              type: "line",
+              x0: -0.5,
+              y0: 16 * (i + 1) - 0.5,
+              x1: gridCols - 0.5,
+              y1: 16 * (i + 1) - 0.5,
+              line: { color: "black", width: 2 },
+            })),
+
+            // 🔹 Thicker divider lines every 24 columns
+            ...Array.from({ length: Math.floor(gridCols / 24) }).map((_, i) => ({
+              type: "line",
+              x0: 24 * (i + 1) - 0.5,
+              y0: -0.5,
+              x1: 24 * (i + 1) - 0.5,
+              y1: gridRows - 0.5,
+              line: { color: "black", width: 2 },
+            })),
+          ],
         }}
       />
 
