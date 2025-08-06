@@ -13,19 +13,21 @@ const Well384 = () => {
         <Banner
           title="384 Well Plate"
           subtitle={
-            <>
-              To use the feature:
-              <br />
-              1. Download existing template and fill in data for analysis. 
-              <br />
-              2. Leave first color ranges as default, it highlight both 0 and undefined data.
-              <br />
-              3. Please set your ranges and target first and finally upload your csv file.
-              <br />
-              Crop the section needed on violin plot to identify the range and generate a csv file.
-              <br />
-              The cropped section include every target within the range.
-            </>
+            <div style={{ textAlign: "center" }}>
+              <p>To use the feature:</p>
+              <ol style={{ display: "inline-block", textAlign: "left", paddingLeft: 20, marginTop: 5 }}>
+                <li>Download existing template and fill in data for analysis.</li>
+                <li>Leave first color ranges as default, it highlights both 0 and undefined data.</li>
+                <li>Please set your ranges and target first and finally upload your CSV file.</li>
+              </ol>
+              <p style={{ marginTop: 10 }}>
+                Crop the section needed on violin plot to identify the range and generate a CSV file.
+                <br />
+                The cropped section includes every target within the range.
+                <br />
+                All content within the zoom in view will be downloaded as a CSV.
+              </p>
+            </div>
           }
         />
         <div style={{ display: "flex", gap: "20px", marginTop: 50, justifyContent: 'center' }}>
