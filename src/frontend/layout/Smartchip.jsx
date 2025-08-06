@@ -17,7 +17,7 @@ const ChipCard = () => {
               <p>To use the feature:</p>
               <ol style={{ display: "inline-block", textAlign: "left", paddingLeft: 20, marginTop: 5 }}>
                 <li>Download existing template and fill in data for analysis.</li>
-                <li>Undefined data is defaulty set as white color</li>
+                <li>Undefined data is set as white color</li>
                 <li>Please set your ranges and target first and finally upload your CSV file.</li>
               </ol>
               <p style={{ marginTop: 10 }}>
