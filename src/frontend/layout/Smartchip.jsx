@@ -14,10 +14,17 @@ const ChipCard = () => {
           title="96 Well Plate"
           subtitle={
             <>
-              To use the feature, download existing template and fill in data for analysis. 
-              Please set your ranges and target first and finally upload your csv file.
+              To use the feature:
               <br />
-              Crop the section needed on violin plot to identify the range and generate a csv file
+              1. Download existing template and fill in data for analysis. 
+              <br />
+              2. Leave first color ranges as default, it highlight both 0 and undefined data.
+              <br />
+              3. Please set your ranges and target first and finally upload your csv file.
+              <br />
+              Crop the section needed on violin plot to identify the range and generate a csv file.
+              <br />
+              The cropped section include every target within the range.
             </>
           }
         />
