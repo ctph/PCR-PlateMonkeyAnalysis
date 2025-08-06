@@ -186,6 +186,8 @@ import SampleTypePieChart from "./PiChart";
 const HeatmapPlot = () => {
   const gridRows = 63;
   const gridCols = 72;
+  const gridSize = 72;
+
 
   const [zData, setZData] = useState(
     Array.from({ length: gridRows }, () => Array(gridCols).fill(-1))
@@ -194,7 +196,7 @@ const HeatmapPlot = () => {
     Array.from({ length: gridRows }, () => Array(gridCols).fill(""))
   );
   const [colorRanges, setColorRanges] = useState([
-    { color: "#ffffff", min: 0, max: 10 },
+    { color: "#9b9b9b", min: 0, max: 10 },
   ]);
   const [selectedTarget, setSelectedTarget] = useState("ALL");
   const [csvData, setCsvData] = useState([]);
@@ -321,80 +323,55 @@ const HeatmapPlot = () => {
       <ColorHandling colorRanges={colorRanges} setColorRanges={setColorRanges} />
 
       <Plot
+        key={selectedTarget}
         data={[
           {
-            z: processedZ,
-            text: processedText,
+            z: zData,
+            text: textData,
             hoverinfo: "text",
             hovertemplate: "%{text}<extra></extra>",
             type: "heatmap",
             colorscale: createCustomColorscale(),
             showscale: true,
-            zmin: zmin,
-            zmax: zmax,
-            xgap: 0.1, // Small gaps to show borders
-            ygap: 0.1,
+            zmin,
+            zmax,
+
+            // Proper positioning to fill grid
+            x0: 0,
+            dx: 1,
+            y0: 0,
+            dy: 1,
+
+            xgap: 0.3,
+            ygap: 0.3,
           },
         ]}
         layout={{
           width: 800,
           height: 800,
-          title: `384-Well Plate Heatmap - ${selectedTarget}`,
+          title: `96-Well Plate Heatmap - ${selectedTarget}`,
           plot_bgcolor: "#000000",
-          paper_bgcolor: "#ffffff",
           xaxis: {
             title: "Column",
             showgrid: false,
             zeroline: false,
+            range: [0, gridSize],
+            scaleanchor: "y",
+            constrain: "domain",
           },
           yaxis: {
             title: "Row",
             autorange: "reversed",
             showgrid: false,
             zeroline: false,
+            range: [0, gridSize],
+            constrain: "domain",
           },
           margin: { t: 50, b: 50, l: 50, r: 50 },
-          shapes: [
-            // Thin black grid lines for all cells
-            ...Array.from({ length: gridRows + 1 }).map((_, r) => ({
-              type: "line",
-              x0: -0.5,
-              y0: r - 0.5,
-              x1: gridCols - 0.5,
-              y1: r - 0.5,
-              line: { color: "black", width: 0.3 },
-            })),
-            ...Array.from({ length: gridCols + 1 }).map((_, c) => ({
-              type: "line",
-              x0: c - 0.5,
-              y0: -0.5,
-              x1: c - 0.5,
-              y1: gridRows - 0.5,
-              line: { color: "black", width: 0.3 },
-            })),
-
-            // 🔹 Thicker divider lines every 16 rows
-            ...Array.from({ length: Math.floor(gridRows / 16) }).map((_, i) => ({
-              type: "line",
-              x0: -0.5,
-              y0: 16 * (i + 1) - 0.5,
-              x1: gridCols - 0.5,
-              y1: 16 * (i + 1) - 0.5,
-              line: { color: "black", width: 2 },
-            })),
-
-            // 🔹 Thicker divider lines every 24 columns
-            ...Array.from({ length: Math.floor(gridCols / 24) }).map((_, i) => ({
-              type: "line",
-              x0: 24 * (i + 1) - 0.5,
-              y0: -0.5,
-              x1: 24 * (i + 1) - 0.5,
-              y1: gridRows - 0.5,
-              line: { color: "black", width: 2 },
-            })),
-          ],
+          shapes: borders,
         }}
       />
+
 
       <SampleTypePieChart csvData={csvData} />
     </div>

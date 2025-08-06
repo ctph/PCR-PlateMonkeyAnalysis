@@ -25,7 +25,7 @@ const Well96 = () => {
               <p>To use the feature:</p>
               <ol style={{ display: "inline-block", textAlign: "left", paddingLeft: 20, marginTop: 5 }}>
                 <li>Download existing template and fill in data for analysis.</li>
-                <li>Leave first color ranges as default, it highlights both 0 and undefined data.</li>
+                <li>Undefined data is defaulty set as white color</li>
                 <li>Please set your ranges and target first and finally upload your CSV file.</li>
               </ol>
               <p style={{ marginTop: 10 }}>
