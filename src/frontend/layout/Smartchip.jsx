@@ -11,7 +11,7 @@ const ChipCard = () => {
     <div style={{ padding: 20 }}>
     <Header/>
         <Banner
-          title="Smart Chip"
+          title="SmartChip"
           subtitle={
             <div style={{ textAlign: "center" }}>
               <p>To use the feature:</p>
