@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Plot from "react-plotly.js";
 import Papa from "papaparse";
 import { Button } from "antd";
@@ -10,15 +10,16 @@ import SampleTypePieChart from "./PiChart";
 const HeatmapPlot = () => {
   const gridRows = 63;
   const gridCols = 72;
+  const EMPTY_VAL = -1;
 
   const [zData, setZData] = useState(
-    Array.from({ length: gridRows }, () => Array(gridCols).fill(-1))
+    Array.from({ length: gridRows }, () => Array(gridCols).fill(EMPTY_VAL))
   );
   const [textData, setTextData] = useState(
     Array.from({ length: gridRows }, () => Array(gridCols).fill(""))
   );
   const [colorRanges, setColorRanges] = useState([
-    { color: "#ffffff", min: -1, max: -1 }
+    { color: "#ffffff", min: -1, max: -1 },
   ]);
   const [selectedTarget, setSelectedTarget] = useState("ALL");
   const [csvData, setCsvData] = useState([]);
@@ -46,9 +47,12 @@ const HeatmapPlot = () => {
   useEffect(() => {
     if (!csvData.length) return;
 
-    const EMPTY_VAL = -1;
-    const grid = Array.from({ length: gridRows }, () => Array(gridCols).fill(EMPTY_VAL));
-    const hoverGrid = Array.from({ length: gridRows }, () => Array(gridCols).fill(""));
+    const grid = Array.from({ length: gridRows }, () =>
+      Array(gridCols).fill(EMPTY_VAL)
+    );
+    const hoverGrid = Array.from({ length: gridRows }, () =>
+      Array(gridCols).fill("")
+    );
 
     csvData.forEach((row) => {
       const well = row["Well no"];
@@ -63,7 +67,9 @@ const HeatmapPlot = () => {
       if (selectedTarget !== "ALL" && target !== selectedTarget) return;
 
       const value =
-        ctRaw.toString().trim().toUpperCase() === "UNDETERMINED" ? 0 : parseFloat(ctRaw);
+        ctRaw.toString().trim().toUpperCase() === "UNDETERMINED"
+          ? 0
+          : parseFloat(ctRaw);
 
       if (!isNaN(value)) {
         grid[row_id][col_id] = value;
@@ -78,23 +84,32 @@ const HeatmapPlot = () => {
     setTextData(hoverGrid);
   }, [csvData, selectedTarget]);
 
-  // 🔹 No more NaN gaps; use original grid directly
+  // Keep your processed grids
   const processedZ = zData;
   const processedText = textData;
 
-  // 🔹 Custom colorscale based on user-defined ranges
+  // ===== Minimal guards (no logic change for real data) =====
+  const finiteVals = useMemo(
+    () => processedZ.flat().filter((v) => v !== EMPTY_VAL && Number.isFinite(v)),
+    [processedZ]
+  );
+  const hasData = finiteVals.length > 0;
+
+  // Custom colorscale based on user-defined ranges
   const createCustomColorscale = () => {
-    const EMPTY_VAL = -1;
-    const zmin = Math.min(...colorRanges.map((r) => r.min));
-    const zmax = Math.max(...colorRanges.map((r) => r.max));
-    const normalize = (v) => (v - zmin) / (zmax - zmin);
+    // If there is no real data yet, keep the plot white (prevents default blue)
+    if (!hasData) return [[0, "#ffffff"], [1, "#ffffff"]];
+
+    const zminCR = Math.min(...colorRanges.map((r) => r.min));
+    const zmaxCR = Math.max(...colorRanges.map((r) => r.max));
+    const denom = (zmaxCR - zminCR) || 1; // avoid 0/0 on initial state
+    const normalize = (v) => (v - zminCR) / denom;
 
     return [
-      // 🔹 Force undefined (-1) to white
-      [(EMPTY_VAL - zmin) / (zmax - zmin), "#ffffff"],
-      [(EMPTY_VAL - zmin) / (zmax - zmin), "#ffffff"],
-
-      // 🔹 Original colorRanges for 0 → max
+      // Force EMPTY_VAL to white
+      [normalize(EMPTY_VAL), "#ffffff"],
+      [normalize(EMPTY_VAL), "#ffffff"],
+      // User ranges
       ...colorRanges.flatMap((r) => [
         [normalize(r.min), r.color],
         [normalize(r.max), r.color],
@@ -102,16 +117,15 @@ const HeatmapPlot = () => {
     ];
   };
 
-
+  // Keep your original zmin/zmax variables
   const zmin = Math.min(...colorRanges.map((r) => r.min));
   const zmax = Math.max(...colorRanges.map((r) => r.max));
+  const provideZBounds = hasData && isFinite(zmin) && isFinite(zmax) && zmax > zmin;
 
-  // 🔹 Create clean divider lines every 16 rows and 24 columns
+  // Divider lines
   const borders = [];
   const rowStep = 16;
   const colStep = 24;
-
-  // Horizontal lines
   for (let r = rowStep; r < gridRows; r += rowStep) {
     borders.push({
       type: "line",
@@ -122,8 +136,6 @@ const HeatmapPlot = () => {
       line: { color: "black", width: 2 },
     });
   }
-
-  // Vertical lines
   for (let c = colStep; c < gridCols; c += colStep) {
     borders.push({
       type: "line",
@@ -140,7 +152,10 @@ const HeatmapPlot = () => {
       <h2>384 Well Plate Heatmap</h2>
 
       <div style={{ marginBottom: 20 }}>
-        <TargetFilter384 selectedTarget={selectedTarget} setSelectedTarget={setSelectedTarget} />
+        <TargetFilter384
+          selectedTarget={selectedTarget}
+          setSelectedTarget={setSelectedTarget}
+        />
         <input
           type="file"
           accept=".csv"
@@ -148,12 +163,18 @@ const HeatmapPlot = () => {
           style={{ display: "none" }}
           onChange={handleCSVUpload}
         />
-        <Button icon={<UploadOutlined />} onClick={() => document.getElementById("csv-upload").click()}>
+        <Button
+          icon={<UploadOutlined />}
+          onClick={() => document.getElementById("csv-upload").click()}
+        >
           Upload CSV
         </Button>
       </div>
 
-      <ColorHandling384 colorRanges={colorRanges} setColorRanges={setColorRanges} />
+      <ColorHandling384
+        colorRanges={colorRanges}
+        setColorRanges={setColorRanges}
+      />
 
       <Plot
         data={[
@@ -164,10 +185,9 @@ const HeatmapPlot = () => {
             hovertemplate: "%{text}<extra></extra>",
             type: "heatmap",
             colorscale: createCustomColorscale(),
-            showscale: true,
-            zmin: zmin,
-            zmax: zmax,
-            xgap: 0.1, // Small gaps to show borders
+            showscale: hasData,        // hide until real data exists
+            ...(provideZBounds ? { zmin, zmax } : {}), // only when valid
+            xgap: 0.1,
             ygap: 0.1,
           },
         ]}
@@ -177,20 +197,11 @@ const HeatmapPlot = () => {
           title: `384-Well Plate Heatmap - ${selectedTarget}`,
           plot_bgcolor: "#000000",
           paper_bgcolor: "#ffffff",
-          xaxis: {
-            title: "Column",
-            showgrid: false,
-            zeroline: false,
-          },
-          yaxis: {
-            title: "Row",
-            autorange: "reversed",
-            showgrid: false,
-            zeroline: false,
-          },
+          xaxis: { title: "Column", showgrid: false, zeroline: false },
+          yaxis: { title: "Row", autorange: "reversed", showgrid: false, zeroline: false },
           margin: { t: 50, b: 50, l: 50, r: 50 },
           shapes: [
-            // Thin black grid lines for all cells
+            // thin grid
             ...Array.from({ length: gridRows + 1 }).map((_, r) => ({
               type: "line",
               x0: -0.5,
@@ -207,8 +218,7 @@ const HeatmapPlot = () => {
               y1: gridRows - 0.5,
               line: { color: "black", width: 0.3 },
             })),
-
-            // 🔹 Thicker divider lines every 16 rows
+            // thicker section dividers
             ...Array.from({ length: Math.floor(gridRows / 16) }).map((_, i) => ({
               type: "line",
               x0: -0.5,
@@ -217,8 +227,6 @@ const HeatmapPlot = () => {
               y1: 16 * (i + 1) - 0.5,
               line: { color: "black", width: 2 },
             })),
-
-            // 🔹 Thicker divider lines every 24 columns
             ...Array.from({ length: Math.floor(gridCols / 24) }).map((_, i) => ({
               type: "line",
               x0: 24 * (i + 1) - 0.5,
@@ -227,6 +235,7 @@ const HeatmapPlot = () => {
               y1: gridRows - 0.5,
               line: { color: "black", width: 2 },
             })),
+            ...borders,
           ],
         }}
       />
