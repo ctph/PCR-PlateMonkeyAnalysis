@@ -18,7 +18,8 @@ const ChipCard = () => {
               <ol style={{ display: "inline-block", textAlign: "left", paddingLeft: 20, marginTop: 5 }}>
                 <li>Download existing template and fill in data for analysis.</li>
                 <li>Undefined data is set as white color</li>
-                <li>Please set your ranges and target first and finally upload your CSV file.</li>
+                <li>Please set your ranges and finally upload your CSV file.</li>
+                <li>Filter target and heatmap will be plot accordingly</li>
               </ol>
               <p style={{ marginTop: 10 }}>
                 Crop the section needed on violin plot to identify the range and generate a CSV file.
