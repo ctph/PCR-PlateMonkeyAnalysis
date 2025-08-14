@@ -105,9 +105,10 @@ const HeatmapPlot = () => {
       if (!well || ctRaw === undefined) return;
       if (selectedTarget !== "ALL" && target !== selectedTarget) return;
 
-      const value =
-        ctRaw.toString().trim().toUpperCase() === "UNDETERMINED" ? 0 : parseFloat(ctRaw);
+      const isUndetermined = ctRaw.toString().trim().toUpperCase() === "UNDETERMINED";
+      const value = isUndetermined ? -1 : parseFloat(ctRaw);
       const coords = getNextUnusedWell(well, wellPositionMap);
+      const displayCt = isUndetermined ? "UNDETERMINED" : value;
 
       if (coords && !isNaN(value)) {
         const [r, c] = coords;
@@ -116,7 +117,7 @@ const HeatmapPlot = () => {
           `Assay: ${assay}<br>` +
           `Well: ${well}<br>` +
           `Sample ID: ${sampleId}<br>` +
-          `Ct: ${value}<br>` +
+          `Ct: ${displayCt}<br>` +
           `Row.No: ${rowNo}<br>` +
           `Column no: ${colNo}`;
       }
