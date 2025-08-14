@@ -102,7 +102,7 @@ const HeatmapPlotSmartchip = () => {
 
   return (
     <div style={{ textAlign: "center", padding: 5 }}>
-      <h2>SmartChip PRRSV Heatmap</h2>
+      <h2>SmartChip Heatmap</h2>
 
       <div style={{ marginBottom: 20 }}>
         <TargetFilter selectedTarget={selectedTarget} setSelectedTarget={setSelectedTarget} />
