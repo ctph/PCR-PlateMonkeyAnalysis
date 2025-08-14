@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Plot from "react-plotly.js";
 import Papa from "papaparse";
-import { Button } from "antd";
+import { Button, message, Tag } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import ColorHandling from "./ColorHandling";
 import TargetFilter from "./TargetFilter";
@@ -22,6 +22,7 @@ const HeatmapPlot = () => {
   const [csvData, setCsvData] = useState([]);
   const [selectedTarget, setSelectedTarget] = useState("ALL");
   const [wellPositionMap, setWellPositionMap] = useState({});
+  const [fileName, setFileName] = useState("");
 
   const [colorRanges, setColorRanges] = useState([
     { color: "#9b9b9b", min: 0, max: 10 },
@@ -36,10 +37,19 @@ const HeatmapPlot = () => {
   const handleCSVUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
+
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
-      complete: (results) => setCsvData(results.data),
+      complete: (results) => {
+        setCsvData(results.data);
+        setFileName(file.name);                 
+        message.success(`File "${file.name}" uploaded successfully`);
+      },
+      error: (err) => {
+        message.error(`Upload failed: ${err.message || "Parse error"}`);
+        event.target.value = "";
+      },
     });
   };
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Plot from "react-plotly.js";
 import Papa from "papaparse";
-import { Button } from "antd";
+import { Button, message, Tag } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import ColorHandling384 from "./ColorHandling384";
 import TargetFilter384 from "./TargetFilter384";
@@ -24,7 +24,8 @@ const HeatmapPlot = () => {
   const [selectedTarget, setSelectedTarget] = useState("ALL");
   const [csvData, setCsvData] = useState([]);
   const [wellPositionMap, setWellPositionMap] = useState({});
-
+  const [fileName, setFileName] = useState("");
+  
   useEffect(() => {
     fetch("/384position_map.json")
       .then((res) => res.json())
@@ -40,6 +41,8 @@ const HeatmapPlot = () => {
       skipEmptyLines: true,
       complete: (results) => {
         setCsvData(results.data);
+        setFileName(file.name); // store filename
+        message.success(`File "${file.name}" uploaded successfully`);
       },
     });
   };
@@ -169,6 +172,11 @@ const HeatmapPlot = () => {
         >
           Upload CSV
         </Button>
+        {fileName && (
+          <div style={{ marginTop: 10 }}>
+            <Tag color="green">📄 {fileName}</Tag>
+          </div>
+        )}
       </div>
 
       <ColorHandling384
