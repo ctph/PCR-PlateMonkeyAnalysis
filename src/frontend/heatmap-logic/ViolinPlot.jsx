@@ -55,6 +55,7 @@ const ViolinPlot = () => {
       groups[target].push({
         y: ct,
         text: `
+          Assay: ${row["Assay"] || "N/A"}<br>
           Well: ${row["Well no"] || "N/A"}<br>
           Sample ID: ${row["Sample iD"] || "N/A"}<br>
           Ct: ${ct}<br>
