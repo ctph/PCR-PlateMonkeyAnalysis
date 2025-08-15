@@ -18,7 +18,11 @@ const HeatmapPlotSmartchip = () => {
   const [csvData, setCsvData] = useState([]);
   const [fileName, setFileName] = useState("");
 
-  // dynamic target filter
+  // Assay filter
+  const [assays, setAssays] = useState(["ALL"]);
+  const [selectedAssay, setSelectedAssay] = useState("ALL");
+
+  // Target filter (depends on selected assay)
   const [targets, setTargets] = useState(["ALL"]);
   const [selectedTarget, setSelectedTarget] = useState("ALL");
 
@@ -29,11 +33,12 @@ const HeatmapPlotSmartchip = () => {
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
+      dynamicTyping: true, // auto-number Row/Col/Ct where possible
       complete: (results) => {
         setCsvData(results.data || []);
         setFileName(file.name);
         message.success(`File "${file.name}" uploaded successfully`);
-        // allow selecting the same file again later
+        // allow re-selecting the same file
         event.target.value = "";
       },
       error: (err) => {
@@ -43,7 +48,34 @@ const HeatmapPlotSmartchip = () => {
     });
   };
 
-  // Recompute dynamic targets whenever csvData changes
+  // Build Assay list on csv load
+  useEffect(() => {
+    if (!csvData?.length) {
+      setAssays(["ALL"]);
+      setSelectedAssay("ALL");
+      setTargets(["ALL"]);
+      setSelectedTarget("ALL");
+      return;
+    }
+
+    const uniqueAssays = Array.from(
+      new Set(
+        csvData
+          .map((r) => (r["Assay"] ?? "").toString().trim().toUpperCase())
+          .filter(Boolean)
+      )
+    ).sort();
+
+    const nextAssays = ["ALL", ...uniqueAssays];
+    setAssays(nextAssays);
+
+    // keep selection if still valid, else reset
+    if (!nextAssays.includes(selectedAssay)) {
+      setSelectedAssay("ALL");
+    }
+  }, [csvData]);
+
+  // Build Target list whenever csvData or selectedAssay changes
   useEffect(() => {
     if (!csvData?.length) {
       setTargets(["ALL"]);
@@ -51,12 +83,16 @@ const HeatmapPlotSmartchip = () => {
       return;
     }
 
-    // Only consider rows with Assay === PRRSV to match your plotting filter
+    const rows = csvData.filter((r) => {
+      const assay = (r["Assay"] ?? "").toString().trim().toUpperCase();
+      if (selectedAssay === "ALL") return Boolean(assay);
+      return assay === selectedAssay;
+    });
+
     const uniqueTargets = Array.from(
       new Set(
-        csvData
-          .filter(r => (r["Assay"] || "").toString().trim().toUpperCase() === "PRRSV")
-          .map(r => (r["Target"] ?? "").toString().trim().toUpperCase())
+        rows
+          .map((r) => (r["Target"] ?? "").toString().trim().toUpperCase())
           .filter(Boolean)
       )
     ).sort();
@@ -64,13 +100,12 @@ const HeatmapPlotSmartchip = () => {
     const nextTargets = ["ALL", ...uniqueTargets];
     setTargets(nextTargets);
 
-    // if current selection no longer valid, reset to ALL
     if (!nextTargets.includes(selectedTarget)) {
       setSelectedTarget("ALL");
     }
-  }, [csvData]);
+  }, [csvData, selectedAssay]);
 
-  // Build grids whenever data or selected target changes
+  // Build heatmap grids whenever data / assay / target changes
   useEffect(() => {
     if (!csvData.length) return;
 
@@ -78,45 +113,63 @@ const HeatmapPlotSmartchip = () => {
     const hoverGrid = Array.from({ length: GRID }, () => Array(GRID).fill(""));
 
     csvData.forEach((row) => {
-      const assayType = row["Assay"]?.toString().trim().toUpperCase();
-      if (assayType !== "PRRSV") return;
+      const assayType = (row["Assay"] ?? "").toString().trim().toUpperCase();
+      if (selectedAssay !== "ALL" && assayType !== selectedAssay) return;
 
-      const target = row["Target"]?.toString().trim().toUpperCase();
+      const target = (row["Target"] ?? "").toString().trim().toUpperCase();
       if (selectedTarget !== "ALL" && target !== selectedTarget) return;
 
       const ctRaw = row["Ct value"];
-      const r = parseInt(row["Row.No"]);
-      const c = parseInt(row["Column no"]);
-      const sampleId = row["Sample iD"] ?? "";
+      const r = parseInt(row["Row.No"], 10);
+      const c = parseInt(row["Column no"], 10);
+      const sampleId = (row["Sample iD"] ?? "").toString();
       const well = row["Well no"];
-      const assay = row["Assay"];
 
       if (Number.isNaN(r) || Number.isNaN(c) || ctRaw == null) return;
+      if (r < 0 || r >= GRID || c < 0 || c >= GRID) return;
 
-      const value = ctRaw.toString().trim().toUpperCase() === "UNDETERMINED" ? 0 : parseFloat(ctRaw);
-      if (!Number.isNaN(value) && r >= 0 && r < GRID && c >= 0 && c < GRID) {
-        grid[r][c] = value;
-        hoverGrid[r][c] = `<br>Assay: ${assay}<br>Well Number: ${well}<br>Sample ID: ${sampleId}<br>Ct: ${value}`;
-      }
+      const isUndetermined =
+        typeof ctRaw === "string" &&
+        ctRaw.toString().trim().toUpperCase() === "UNDETERMINED";
+
+      const value = isUndetermined ? 0 : parseFloat(ctRaw);
+      if (Number.isNaN(value)) return;
+
+      grid[r][c] = value;
+      hoverGrid[r][c] =
+        `<br>Assay: ${assayType}` +
+        `<br>Target: ${target || "—"}` +
+        `<br>Well Number: ${well ?? "—"}` +
+        `<br>Sample ID: ${sampleId || "—"}` +
+        `<br>Ct: ${isUndetermined ? "Undetermined (plotted as 0)" : value}`;
     });
 
     setZData(grid);
     setTextData(hoverGrid);
-  }, [csvData, selectedTarget]);
+  }, [csvData, selectedAssay, selectedTarget]);
 
   const createCustomColorscale = () => {
-    const zmin = Math.min(...colorRanges.map((r) => r.min));
-    const zmax = Math.max(...colorRanges.map((r) => r.max));
+    const mins = colorRanges.map((r) => r.min);
+    const maxs = colorRanges.map((r) => r.max);
+    const zminLocal = Math.min(...mins);
+    const zmaxLocal = Math.max(...maxs);
+
+    if (!isFinite(zminLocal) || !isFinite(zmaxLocal)) {
+      return [["0", "#ffffff"], ["1", "#ffffff"]];
+    }
+    // avoid divide-by-zero if zmin === zmax
+    const span = zmaxLocal - zminLocal || 1;
+
     return colorRanges.flatMap((r) => [
-      [(r.min - zmin) / (zmax - zmin), r.color],
-      [(r.max - zmin) / (zmax - zmin), r.color],
+      [(r.min - zminLocal) / span, r.color],
+      [(r.max - zminLocal) / span, r.color],
     ]);
   };
 
   const zmin = Math.min(...colorRanges.map((r) => r.min));
   const zmax = Math.max(...colorRanges.map((r) => r.max));
 
-  return (
+    return (
     <div style={{ textAlign: "center", padding: 5 }}>
       <h2>SmartChip Heatmap</h2>
 
