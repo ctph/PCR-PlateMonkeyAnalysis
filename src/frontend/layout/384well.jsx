@@ -22,7 +22,7 @@ const Well384 = () => {
                 <li>Filter target and heatmap will be plot accordingly</li>
               </ol>
               <p style={{ marginTop: 10 }}>
-                Crop the section needed on violin plot to identify the range and generate a CSV file.
+                Crop or zoom in to the section needed on violin plot to identify the range and generate a CSV file.
                 <br />
                 The cropped section includes every target within the range.
                 <br />
