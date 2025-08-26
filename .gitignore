@@ -22,3 +22,4 @@ dist/
 .idea/
 EOL
 node_modules/
+.DS_Store
